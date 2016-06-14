@@ -1,76 +1,39 @@
+'use strict';
+
 var request = require('request'),
-    cheerio = require('cheerio'),
-    sleep = require('sleep');
-
-
-var sendMessagesWithTimeout = function(chatId, messages, quantity, bot){
-
-    var counter = 0,
-        quantity = quantity,
-        chatId = chatId,
-        messages = messages,
-        bot = bot;
-
-    return function send(){
-
-        bot.sendMessage(chatId, messages[counter]);
-        counter++
-
-        if(counter < quantity){
-
-            setTimeout(send,1000);
-
-        }else{
-
-            setTimeout(function(){
-                bot.sendMessage(chatId, 'Чтобы начать поиск, напишите /search.');
-            },1000);
-
-            return;
-        }
-    }
-};
-
+    TelegramBot = require('node-telegram-bot-api');
 
 var avito = function(userRequest, maxQuantityOfMessages, chatId, bot){
     
-    switch(userRequest.parametrs[0]){
-        case ('снять'):
+    try{
 
-            var parser = require('./sdamParser');
-            var view = require('./views/sdam')
-            var url = 'https://www.avito.ru/' + userRequest.where+'/' 
-                      +userRequest.what + '/sdam';
-            break;
+        var parser = require('./parsers/' + userRequest.parametrs[0] + '/parser'),
+            pageParser = require('./parsers/' + userRequest.parametrs[0] + '/pageParser'),
+            view = require('./views/' + userRequest.parametrs[0]),
+            url = 'https://www.avito.ru/' + userRequest.where+'/' 
+                  +userRequest.what + '/' + userRequest.parametrs[0];
 
-        default:
+    }catch(e){
 
-            console.log('Такое искать не умею =(');  
-
-    }
+        console.log(e);
     
+    }
+
     request(url, function(err, res, body){
 
         if(err)console.error(err);
         else if(body){
 
-            var $= cheerio.load(body);
-            var text = $('.catalog-list').text();
-            var parsedData = parser(text);
+            var parsedData = parser(body, maxQuantityOfMessages);
 
-            if(parsedData && parsedData[0]){
-                
-            
+            if(parsedData && parsedData[0]){ 
 
-                var messages = view(parsedData,maxQuantityOfMessages),
-                    maxIndex = messages.length;
-
-                var sendMessages = sendMessagesWithTimeout(chatId, messages, maxIndex, bot);
+                var sendMessages = view(chatId, parsedData, bot);
                 sendMessages();
 
             }else{
 
-                bot.sendMessage(chatId, 'Объявлений не найдено =(. Чтобы начать поиск, напишите /search.');
+                bot.sendMessage(chatId, 'Ничего не найдено =(');
 
             }
 
@@ -78,7 +41,6 @@ var avito = function(userRequest, maxQuantityOfMessages, chatId, bot){
 
     });
     
-
 };
 
 module.exports = avito;

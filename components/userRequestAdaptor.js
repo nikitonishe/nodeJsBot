@@ -1,3 +1,5 @@
+'use strict';
+
 var translate = function(){
 	var rus = ['а', 'б', 'в', 'г', 'д', 'е', 'ё', 'ж', 'з', 'и', 'й',
 	           'к', 'л', 'м', 'н', 'о', 'п', 'р', 'с', 'т', 'у', 'ф',
@@ -11,7 +13,7 @@ var translate = function(){
 
 		if(ru && typeof(ru) === 'string'){
 
-	        for(i = 0; i<rus.length; i++){
+	        for(var i = 0; i<rus.length; i++){
 	            ru = (ru.split(rus[i])).join(eng[i]);
 	        }
 	        return ru;
@@ -23,7 +25,7 @@ var translate = function(){
 	};
 };
 
-Request = function(where,what,parametrs){
+var Request = function(where,what,parametrs){
 	this.where = where;
 	this.what = what;
 	this.parametrs = parametrs;    
@@ -32,7 +34,7 @@ Request = function(where,what,parametrs){
 
 var adaptUserRequest = function(userRequest){
 
-	userRequest += 'квартиры/снять';
+	userRequest += 'квартиры/сдам';
     userRequest = userRequest.split('/');
 
     var where = userRequest.shift(),
@@ -40,7 +42,12 @@ var adaptUserRequest = function(userRequest){
         parametrs = userRequest;
     where = translate()(where);
     what = translate()(what);
-    adaptedRequest = new Request(where,what,parametrs);
+
+    for(var i = 0 ; i < parametrs.length; i++ ){
+    	parametrs[i] = translate()(parametrs[i]);
+    }
+
+    var adaptedRequest = new Request(where,what,parametrs);
 	return adaptedRequest;
 };
 

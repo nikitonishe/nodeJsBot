@@ -1,3 +1,5 @@
+'use strict';
+
 var TelegramBot = require('node-telegram-bot-api'),
     storage = require('./locStorage/storage'),
     adaptUserRequest = require('./components/userRequestAdaptor'),
@@ -31,7 +33,7 @@ bot.on('text', function(message){
 
                 if (textMes = textMes.match(/\b[0-9]+\b/)){
 
-                    adaptedRequest = adaptUserRequest(storageItem);
+                    var adaptedRequest = adaptUserRequest(storageItem);
                     requestHandler(adaptedRequest, textMes[0] ,chatId, bot);
                     storage.removeItem(chatId);
 

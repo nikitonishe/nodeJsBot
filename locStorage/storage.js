@@ -1,6 +1,8 @@
+'use strict';
+
 if (typeof localStorage === "undefined" || localStorage === null){
     var LocalStorage = require('node-localstorage').LocalStorage;
-    localStorage = new LocalStorage('./locStorage/items');
+    var localStorage = new LocalStorage('./locStorage/items');
 }
 
 localStorage.__proto__.init = function(chatId){
