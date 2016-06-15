@@ -33,13 +33,12 @@ var Request = function(where,what,parametrs){
 
 
 var adaptUserRequest = function(userRequest){
-
-	userRequest += 'квартиры/сдам';
     userRequest = userRequest.split('/');
 
     var where = userRequest.shift(),
         what = userRequest.shift(),
         parametrs = userRequest;
+
     where = translate()(where);
     what = translate()(what);
 
@@ -48,7 +47,7 @@ var adaptUserRequest = function(userRequest){
     }
 
     var adaptedRequest = new Request(where,what,parametrs);
-	return adaptedRequest;
+	return adaptedRequest;	
 };
 
 module.exports = adaptUserRequest;

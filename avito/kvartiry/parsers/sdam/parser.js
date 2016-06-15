@@ -4,16 +4,12 @@ var cheerio = require('cheerio'),
     math = require('math');
 
 var parser = function(body, maxQuantityOfMessages){
-
     var parsedData = [],
         $ = cheerio.load(body);
-
     var divs = $('.item_table');
-
     var maxIndex = math.min(divs.length,maxQuantityOfMessages);
 
     for(var i = 0; i < maxIndex; i++){
-
         var link,
             title,
             price,
@@ -61,11 +57,8 @@ var parser = function(body, maxQuantityOfMessages){
             date: date,
             commission: commission
         });
-
     }
-
     return parsedData;
-
 };
 
 module.exports = parser;

@@ -1,13 +1,12 @@
 'use strict';
 
 var sendMessagesWithTimeout = function(chatId, parsedData, bot){
-
     var counter = -1,
         chatId = chatId,
         parsedData = parsedData,
         maxIndex = parsedData.length,
         bot = bot;
-        
+
     return function send(){
         counter++;
 
@@ -22,19 +21,15 @@ var sendMessagesWithTimeout = function(chatId, parsedData, bot){
         if(parsedData[counter].location.lat && parsedData[counter].location.lon){
             setTimeout(function(){
                 bot.sendLocation(chatId, parsedData[counter].location.lat, parsedData[counter].location.lon);
-            },100);
+            },400);
         }
 
         if(counter < (maxIndex - 1)){
-
             setTimeout(send,1000);
-
         }else{
-
             setTimeout(function(){
                 bot.sendMessage(chatId, 'Чтобы начать поиск, напишите /search.');
             },1000);
-
         }
     }
 };

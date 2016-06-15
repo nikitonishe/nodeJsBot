@@ -3,7 +3,6 @@
 var cheerio = require('cheerio');
 
 var pageParser = function(body){
-
     var parsedPage = {},
         $ = cheerio.load(body),
         location = {},

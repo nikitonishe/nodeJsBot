@@ -5,20 +5,16 @@ var request = require('request'),
 
 var parser,pageParser,view,url;
 
-var requireModulesAndSetUrl = function(userRequest){
+var requireModulesAndSetUrl = function(userRequest, chatId, bot){
     try{
-
         parser = require('./parsers/' + userRequest.parametrs[0] + '/parser');
         pageParser = require('./parsers/' + userRequest.parametrs[0] + '/pageParser');
         view = require('./views/' + userRequest.parametrs[0]);
         url = 'https://www.avito.ru/' + userRequest.where+'/' 
                 +userRequest.what + '/' + userRequest.parametrs[0];
         return true;
-
     }catch(e){
-
-        throw e;
-    
+        bot.sendMessage(chatId, 'Что то не так =(. Скорее всего я не умею искать объявления типа ' + userRequest.parametrs[0]);
     }
 };
 
@@ -26,7 +22,6 @@ var parsePage = function(parsedData, chatId, bot){
     var counter = 0;
     return function req(){
         var url = 'https://www.avito.ru' + parsedData[counter].link;
-
         request(url, function(err, res, body){
             if(err)console.error(err);
             else if (body){
@@ -41,39 +36,26 @@ var parsePage = function(parsedData, chatId, bot){
                 }else{
                     req();
                 }
-                
             }
-            
         });
     }
 };
 
 var avito = function(userRequest, maxQuantityOfMessages, chatId, bot){
-    
-    requireModulesAndSetUrl(userRequest);
-
-    request(url, function(err, res, body){
-
-        if(err)console.error(err);
-        else if(body){
-
-            var parsedData = parser(body, maxQuantityOfMessages);
-
-            if(parsedData && parsedData[0]){ 
-
-                var req = parsePage(parsedData, chatId, bot);
-                req();
-
-            }else{
-
-                bot.sendMessage(chatId, 'Ничего не найдено =(');
-
+    if(requireModulesAndSetUrl(userRequest, chatId, bot)){
+        request(url, function(err, res, body){
+            if(err)console.error(err);
+            else if(body){
+                var parsedData = parser(body, maxQuantityOfMessages);
+                if(parsedData && parsedData[0]){ 
+                    var req = parsePage(parsedData, chatId, bot);
+                    req();
+                }else{
+                    bot.sendMessage(chatId, 'Ничего не найдено =(');
+                }
             }
-
-        }
-
-    });
-    
+        });
+    }
 };
 
 module.exports = avito;
