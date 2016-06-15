@@ -2,14 +2,14 @@
 
 var sendMessagesWithTimeout = function(chatId, parsedData, bot){
 
-    var counter = 0,
+    var counter = -1,
         chatId = chatId,
         parsedData = parsedData,
         maxIndex = parsedData.length,
         bot = bot;
-
-
+        
     return function send(){
+        counter++;
 
         var message = parsedData[counter].title;
 
@@ -19,9 +19,13 @@ var sendMessagesWithTimeout = function(chatId, parsedData, bot){
         message += parsedData[counter].date ? ('\nдата размещения объявления: ' + parsedData[counter].date) : '';
 
         bot.sendMessage(chatId, message);
-        counter++;
+        if(parsedData[counter].location.lat && parsedData[counter].location.lon){
+            setTimeout(function(){
+                bot.sendLocation(chatId, parsedData[counter].location.lat, parsedData[counter].location.lon);
+            },100);
+        }
 
-        if(counter < maxIndex){
+        if(counter < (maxIndex - 1)){
 
             setTimeout(send,1000);
 

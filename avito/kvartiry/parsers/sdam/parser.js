@@ -25,17 +25,22 @@ var parser = function(body, maxQuantityOfMessages){
         var div = divs[i];
         var id = $(div).attr('id');
 
-        link = $('#'+id+' a');
+        link = $('#'+id+' h3.title a');
         link = $(link).attr('href').trim().replace(/\s+/g,' ');
 
         title = $('#'+id+' h3.title');
         title = $(title).text().trim().replace(/\s+/g,' ');
 
-        price = $('#'+id+' div.about');
-        price = $(price).text().trim().replace(/\s+/g,' ').replace(/комиссия\s\d+\s%|без\sкомиссии/,'');
-
         address = $('#'+id+' p.address');
         address = $(address).text().trim().replace(/\s+/g,' ');
+
+        if(!link || !title || !address){
+            console.log(1);
+            continue;
+        }
+
+        price = $('#'+id+' div.about');
+        price = $(price).text().trim().replace(/\s+/g,' ').replace(/комиссия\s\d+\s%|без\sкомиссии/,'');
 
         middleman = $('#'+id+' .data p');
         middleman = $(middleman).text().trim().replace(/\s+/g,'');

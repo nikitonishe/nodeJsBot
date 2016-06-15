@@ -12,7 +12,6 @@ var pageParser = function(body){
     lat = $('.g_123 .l-content .description-expanded .b-search-map');
     location.lat = $(lat).attr('data-map-lat');
     location.lon = $(lat).attr('data-map-lon');
-
     parsedPage.location = location;
     return parsedPage;
 };
