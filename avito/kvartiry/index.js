@@ -14,7 +14,8 @@ var requireModulesAndSetUrl = function(userRequest, chatId, bot){
                 +userRequest.what + '/' + userRequest.parametrs[0];
         return true;
     }catch(e){
-        bot.sendMessage(chatId, 'Что то не так =(. Скорее всего я не умею искать объявления типа ' + userRequest.parametrs[0]);
+        throw(e);
+        //bot.sendMessage(chatId, 'Что то не так =(. Скорее всего я не умею искать объявления типа ' + userRequest.parametrs[0]);
     }
 };
 

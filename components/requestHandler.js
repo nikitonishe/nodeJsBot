@@ -5,7 +5,8 @@ var requestHandler = function(request, maxQuantityOfMessages, chatId, bot){
     	var index = require('../avito/'+request.what+'/index');
         index(request, maxQuantityOfMessages, chatId, bot);
     }catch(e){
-        bot.sendMessage(chatId,'Что то не так =(. Я не умею искать такие объявления.');
+    	throw e;
+        //bot.sendMessage(chatId,'Что то не так =(. Я не умею искать такие объявления.');
     }
 }
 

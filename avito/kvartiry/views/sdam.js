@@ -2,10 +2,7 @@
 
 var sendMessagesWithTimeout = function(chatId, parsedData, bot){
     var counter = -1,
-        chatId = chatId,
-        parsedData = parsedData,
-        maxIndex = parsedData.length,
-        bot = bot;
+        maxIndex = parsedData.length;
 
     return function send(){
         counter++;
