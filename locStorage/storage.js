@@ -12,5 +12,3 @@ localStorage.__proto__.init = function(chatId){
 if(localStorage){
     module.exports = localStorage;
 }
-
-localStorage.removeItem('220355574');

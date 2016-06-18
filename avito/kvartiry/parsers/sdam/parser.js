@@ -1,15 +1,14 @@
 'use strict';
 
 var cheerio = require('cheerio'),
-    math = require('math');
+    compareDate = require('./utilits/compareDate');
 
 var parser = function(body, maxQuantityOfMessages){
     var parsedData = [],
         $ = cheerio.load(body);
     var divs = $('.item_table');
-    var maxIndex = math.min(divs.length,maxQuantityOfMessages);
 
-    for(var i = 0; i < maxIndex; i++){
+    for(var i = 0; i < divs.length; i++){
         var link,
             title,
             price,
@@ -30,8 +29,10 @@ var parser = function(body, maxQuantityOfMessages){
         address = $('#'+id+' p.address');
         address = $(address).text().trim().replace(/\s+/g,' ');
 
-        if(!link || !title || !address){
-            console.log(1);
+        date = $('#'+id+' .data .clearfix .date');
+        date = $(date).text().trim().replace(/\s+/g,' ');
+
+        if(!link || !title || !address || !date){
             continue;
         }
 
@@ -41,9 +42,6 @@ var parser = function(body, maxQuantityOfMessages){
         middleman = $('#'+id+' .data p');
         middleman = $(middleman).text().trim().replace(/\s+/g,'');
         middleman = middleman ? middleman : 'Без посредников';
-
-        date = $('#'+id+' .data .clearfix .date');
-        date = $(date).text().trim().replace(/\s+/g,' ');
 
         commission = $('#'+id+' .about span');
         commission = $(commission).text().trim().replace(/\s+/g,' ');
@@ -58,6 +56,12 @@ var parser = function(body, maxQuantityOfMessages){
             commission: commission
         });
     }
+
+    var maxIndex = divs.length > maxQuantityOfMessages ? maxQuantityOfMessages : divs.length;
+    parsedData.splice(maxIndex-1,divs.length-maxIndex);
+
+    parsedData.sort(compareDate);
+    
     return parsedData;
 };
 

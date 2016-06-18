@@ -27,6 +27,7 @@ var parsePage = function(parsedData, chatId, bot){
             if(err)console.error(err);
             else if (body){
                 var parsedPage = pageParser(body);
+                parsedData[counter].photoLink = parsedPage.photoLink
                 parsedData[counter].location = {};
                 parsedData[counter].location.lat = parsedPage.location.lat;
                 parsedData[counter].location.lon = parsedPage.location.lon;
