@@ -1,7 +1,9 @@
 'use strict';
 
 var request = require('request'),
-    TelegramBot = require('node-telegram-bot-api');
+    TelegramBot = require('node-telegram-bot-api'),
+    async = require('async'),
+    Promise = require('promise');
 
 var parser,pageParser,view,url;
 
@@ -19,45 +21,78 @@ var requireModulesAndSetUrl = function(userRequest, chatId, bot){
     }
 };
 
-var parsePage = function(parsedData, chatId, bot){
-    var counter = 0;
-    return function req(){
-        var url = 'https://www.avito.ru' + parsedData[counter].link;
+var parsePage = function(parsedData,chatId, bot){
+    async.each(parsedData, function(ad, callback){
+        var url = 'https://www.avito.ru' + ad.link;
         request(url, function(err, res, body){
             if(err)console.error(err);
-            else if (body){
+            if (body){
                 var parsedPage = pageParser(body);
-                parsedData[counter].photoLink = parsedPage.photoLink
-                parsedData[counter].location = {};
-                parsedData[counter].location.lat = parsedPage.location.lat;
-                parsedData[counter].location.lon = parsedPage.location.lon;
-                counter ++;
-                if(counter === parsedData.length){
-                    var sendMessages = view(chatId, parsedData, bot);
-                    sendMessages();
-                }else{
-                    req();
-                }
+                ad.photoLink = parsedPage.photoLink
+                ad.location = {};
+                ad.location.lat = parsedPage.location.lat;
+                ad.location.lon = parsedPage.location.lon;
+                callback();
             }
+        })
+    },function(err){
+        if(err){
+            console.log(err);
+        }else{
+            view(chatId, parsedData, bot)();
+        }
+    });
+};
+/*
+var parsePage = function(parsedData,chatId, bot){
+    async.each(parsedData, function(ad, callback){
+        var url = 'https://www.avito.ru' + ad.link;
+        var pageRequest = requestPromiseDecorator(url);
+        pageRequest.then(function(err,req,body){
+            var parsedPage = pageParser(body);
+            console.log(parsedPage);
+            return parsedPage;
+        }).catch(function(err){
+            console.log(err);
         });
-    }
+    },function(err){
+        if(err){
+            console.log(err);
+        }else{
+            view(chatId, parsedData, bot)();
+        }
+    });
+};
+*/
+
+var requestPromiseDecorator = function(url){
+    var promise = new Promise(function(resolve,reject){
+        request(url, function(err,req,body){
+            resolve(body);
+        });
+    })
+    return promise;
 };
 
 var avito = function(userRequest, maxQuantityOfMessages, chatId, bot){
-    if(requireModulesAndSetUrl(userRequest, chatId, bot)){
-        request(url, function(err, res, body){
-            if(err)console.error(err);
-            else if(body){
-                var parsedData = parser(body, maxQuantityOfMessages);
-                if(parsedData && parsedData[0]){ 
-                    var req = parsePage(parsedData, chatId, bot);
-                    req();
-                }else{
-                    bot.sendMessage(chatId, 'Ничего не найдено =(');
-                }
-            }
-        });
+
+    if(!requireModulesAndSetUrl(userRequest, chatId, bot)){
+        return;
     }
+
+    var firstRequest = requestPromiseDecorator(url)
+
+    firstRequest.then(function(body){
+        var parsedData = parser(body, maxQuantityOfMessages);
+        if(parsedData && parsedData[0]){ 
+            parsePage(parsedData, chatId, bot);
+        }else{
+            bot.sendMessage(chatId, 'Ничего не найдено =(');
+        }
+        return;
+    }).catch(function(err) {
+        console.log(err);
+    })
 };
 
 module.exports = avito;

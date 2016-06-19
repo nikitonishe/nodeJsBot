@@ -23,7 +23,7 @@ var translate = function(){
         }
 
 	};
-};
+}();
 
 var Request = function(where,what,parametrs){
 	this.where = where;
@@ -39,11 +39,11 @@ var adaptUserRequest = function(userRequest){
         what = userRequest.shift(),
         parametrs = userRequest;
 
-    where = translate()(where);
-    what = translate()(what);
+    where = translate(where);
+    what = translate(what);
 
     for(var i = 0 ; i < parametrs.length; i++ ){
-    	parametrs[i] = translate()(parametrs[i]);
+    	parametrs[i] = translate(parametrs[i]);
     }
 
     var adaptedRequest = new Request(where,what,parametrs);
