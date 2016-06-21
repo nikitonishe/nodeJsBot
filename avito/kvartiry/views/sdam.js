@@ -1,6 +1,6 @@
 'use strict';
 
-var sendMessagesWithTimeout = function(chatId, parsedData, bot){
+var sendMessagesWithTimeout = function(parsedData, chatId, bot){
     var counter = -1,
         maxIndex = parsedData.length;
 

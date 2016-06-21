@@ -58,10 +58,11 @@ var parser = function(body, maxQuantityOfMessages){
     }
 
     var maxIndex = divs.length > maxQuantityOfMessages ? maxQuantityOfMessages : divs.length;
-    parsedData.splice(maxIndex-1,divs.length-maxIndex);
-
     parsedData.sort(compareDate);
-    
+    parsedData.reverse();
+    parsedData.splice(maxIndex);
+    parsedData.reverse();
+
     return parsedData;
 };
 
