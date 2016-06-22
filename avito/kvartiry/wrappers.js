@@ -50,6 +50,7 @@ var parsePagesWrapper = function(chatId, bot, view, pageParser){
     }
 };
 
+
 module.exports.requestPromiseWrapper = requestPromiseWrapper;
 module.exports.parseMainPageWrapper = parseMainPageWrapper;
 module.exports.parsePagesWrapper = parsePagesWrapper;

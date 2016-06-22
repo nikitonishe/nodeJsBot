@@ -31,7 +31,6 @@ var Request = function(where,what,parametrs){
 	this.parametrs = parametrs;    
 };
 
-
 var adaptUserRequest = function(userRequest){
     userRequest = userRequest.split('/');
 

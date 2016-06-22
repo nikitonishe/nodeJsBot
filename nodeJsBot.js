@@ -60,7 +60,6 @@ bot.on('text', function(message){
             return;
         }
         var adaptedRequest = adaptUserRequest(storageItem);
-        console.log(adaptedRequest);
         requestHandler(adaptedRequest, chatId, bot);
         storage.removeItem(chatId);
 

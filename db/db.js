@@ -1,9 +1,9 @@
 var User = require('./models').User,
     mongoose = require('./models').mongoose;
 
-var setConnectionWrapper = function(){
+var setConnectionWrapper = function(dburl){
     return function(callback){
-        mongoose.connect('mongodb://127.0.0.1:27017/nodeJsBot');
+        mongoose.connect(dburl);
         callback(null, true);
     };
 };

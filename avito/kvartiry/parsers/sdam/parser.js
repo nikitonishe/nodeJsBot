@@ -66,4 +66,5 @@ var parser = function(body, maxQuantityOfMessages){
     return parsedData;
 };
 
+
 module.exports = parser;

@@ -10,5 +10,4 @@ var requestHandler = function(request, chatId, bot){
     }
 }
 
-
 module.exports = requestHandler;

@@ -32,4 +32,5 @@ var sendMessagesWithTimeout = function(parsedData, chatId, bot){
     }
 };
 
+
 module.exports = sendMessagesWithTimeout;

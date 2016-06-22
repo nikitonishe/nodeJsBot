@@ -30,7 +30,7 @@ var mounthToNumber = function(mounth){
 var compareTime = function(time1,time2){
     time1 = time1.split(':');
     time2 = time2.split(':');
-    /*
+    
     if(time1[0]>time2[0]){
         return 1;
     }
@@ -42,24 +42,6 @@ var compareTime = function(time1,time2){
     }
     if(time1[1]>time2[1]){
         return 1;
-    }
-    */
-    if(time1[0]===time2[0]){
-        if(time1[1] === time2[1]){
-            return -1;
-        }else{
-            if(time1[1]>time2[1]){
-                return 1;
-            }else{
-                return -1;
-            }
-        }
-    }else{
-        if(time1[0]>time2[0]){
-            return 1;
-        }else{
-            return -1;
-        }
     }
     
 };
