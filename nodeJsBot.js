@@ -4,9 +4,11 @@ var TelegramBot = require('node-telegram-bot-api'),
     storage = require('./locStorage/storage'),
     adaptUserRequest = require('./components/userRequestAdaptor'),
     requestHandler = require('./components/requestHandler'),
-    db = require('./db/db')
+    db = require('./db/db'),
+    async = require('async'),
+    config = require('./config');
 
-var token = '205555463:AAGlwH_LIB6f-BDkp9UDgoghqE3f6y8-P2c',
+var token = config.token,
     options = {polling: true};
 
 var bot = new TelegramBot(token,options);
@@ -58,24 +60,24 @@ bot.on('text', function(message){
             return;
         }
         var adaptedRequest = adaptUserRequest(storageItem);
+        console.log(adaptedRequest);
         requestHandler(adaptedRequest, chatId, bot);
         storage.removeItem(chatId);
 
-        db.removeUser = db.removeUserWrapper(chatId);
-        db.setUser = db.setUserWrapper(chatId, storageItem, textMes[0]);
+        var removeUser = db.removeUserWrapper(chatId),
+            setConnection = db.setConnectionWrapper(config.dburl),
+            setUser = db.setUserWrapper(chatId, storageItem.replace(/\/[0-9]+/, ''), textMes[0]),
+            getUserRequest = db.getUserRequestWrapper(chatId);
 
-        db.removeUser
-            .then(db.setUser)
-            .then(function(good){
-                if(good){
-                    console.log('все хорошо');
-                }else{
-                    console.log('не все хорошо');
-                }
-            })
-            .catch(function(err){
-                console.log(err);
-            })
+        async.waterfall([
+            setConnection,
+            removeUser,
+            setUser
+            ],function(err, result){
+                if(err) console.log(err);
+                db.mongoose.connection.close();
+            });
+
         return;
     }
 
