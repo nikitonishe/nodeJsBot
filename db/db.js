@@ -37,7 +37,7 @@ var getUserRequestWrapper = function(chatId){
     return function(affected, callback){
         User.findOne({_id: chatId}, function(err, user){
             if(err) callback(err);
-            callback(null, user.getSearchRequest());
+            callback(null, user.get('searchRequest'));
         });
     };
 };

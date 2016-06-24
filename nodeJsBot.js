@@ -1,17 +1,19 @@
 'use strict';
 
 var TelegramBot = require('node-telegram-bot-api'),
-    storage = require('./locStorage/storage'),
+    async = require('async'),
     adaptUserRequest = require('./components/userRequestAdaptor'),
     requestHandler = require('./components/requestHandler'),
     db = require('./db/db'),
-    async = require('async'),
-    config = require('./config');
+    config = require('./config'),
+    AutoUpdate = require('./components/autoUpdate'),
+    LocalStorage = require('node-localstorage').LocalStorage;
 
 var token = config.token,
     options = {polling: true};
 
-var bot = new TelegramBot(token,options);
+var bot = new TelegramBot(token,options),
+    storage = new LocalStorage('./locStorage/items');
 
 bot.on('text', function(message){
     var chatId = message.chat.id,
@@ -34,7 +36,7 @@ bot.on('text', function(message){
                                         '\n/help - помощь по поиску.\n/cancel - отменить текущий поиск.');
                 break;
             case('/search'):
-                storage.init(chatId);
+                storage.setItem(chatId, 1);
                 bot.sendMessage(chatId, 'Где искать?(напишите город или область и город.'+
                                         'Например, "Курск" или "Курская область Железногорск".)');
                 break;
@@ -71,12 +73,13 @@ bot.on('text', function(message){
         async.waterfall([
             setConnection,
             removeUser,
-            setUser
+            setUser,
+            getUserRequest
             ],function(err, result){
                 if(err) console.log(err);
                 db.mongoose.connection.close();
+                console.log(result);
             });
-
         return;
     }
 

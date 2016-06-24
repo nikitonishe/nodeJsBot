@@ -6,11 +6,7 @@ var schema = mongoose.Schema({
   interval: Number
 });
 
-schema.methods.getSearchRequest = function(){
-  return this.get('searchRequest');
-};
-
 var User = mongoose.model('User',schema);
 
-exports.User = mongoose.model('User',schema);
-exports.mongoose = mongoose;
+module.exports.User = mongoose.model('User',schema);
+module.exports.mongoose = mongoose;
