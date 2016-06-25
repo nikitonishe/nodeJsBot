@@ -18,11 +18,10 @@ var removeUserWrapper = function(chatId){
     };
 };
 
-var setUserWrapper = function(chatId, searchRequest, interval){
+var setUserWrapper = function(chatId, searchRequest){
     var user = new User({
         _id: chatId,
         searchRequest: searchRequest,
-        interval: interval
     });
 
     return function(affected, callback){

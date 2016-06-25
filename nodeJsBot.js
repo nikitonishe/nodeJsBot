@@ -23,6 +23,22 @@ bot.on('text', function(message){
 
     if(textMes === '/cancel'){
         storage.removeItem(chatId);
+
+        var autoUpdate = new AutoUpdate();
+
+        autoUpdate.removeInterval(chatId);
+
+        var removeUser = db.removeUserWrapper(chatId),
+            setConnection = db.setConnectionWrapper(config.dburl);
+
+
+        async.waterfall([
+            setConnection,
+            removeUser
+            ],function(err,result){
+                db.mongoose.connection.close();
+                if(err) console.log(err);
+            })
         bot.sendMessage(chatId, 'Поиск отменен. Чтобы начать поиск, напишите /search.');
         return;
     }
@@ -57,8 +73,12 @@ bot.on('text', function(message){
             storage.removeItem(chatId);
             return;
         }
-        if(!textMes.match(/[0-9]+/)){
+        if(!(textMes = textMes.match(/[0-9]+/))){
             bot.sendMessage(chatId, 'Напишите число или "нет".');
+            return;
+        }
+        if(textMes[0] % 5 !== 0 || textMes[0] > 1440){
+            bot.sendMessage(chatId, 'Некорректный интеравал. Попробуйте еще раз. Доступные интервалы: 5, 10, 15 ... 1440.');
             return;
         }
         var adaptedRequest = adaptUserRequest(storageItem);
@@ -67,19 +87,19 @@ bot.on('text', function(message){
 
         var removeUser = db.removeUserWrapper(chatId),
             setConnection = db.setConnectionWrapper(config.dburl),
-            setUser = db.setUserWrapper(chatId, storageItem.replace(/\/[0-9]+/, ''), textMes[0]),
-            getUserRequest = db.getUserRequestWrapper(chatId);
+            setUser = db.setUserWrapper(chatId, storageItem.replace(/\/[0-9]+/, ''));
 
         async.waterfall([
             setConnection,
             removeUser,
-            setUser,
-            getUserRequest
+            setUser
             ],function(err, result){
                 if(err) console.log(err);
                 db.mongoose.connection.close();
-                console.log(result);
             });
+        var autoUpdate = new AutoUpdate();
+        autoUpdate.addInterval(chatId, textMes[0]);
+        autoUpdate.startAutoUpdate();
         return;
     }
 
@@ -94,7 +114,7 @@ bot.on('text', function(message){
         }
         storage.setItem(chatId, storageItem+textMes[0]);
         bot.sendMessage(chatId, 'Хотите, чтобы я автоматически присылал новые объявления?'+ 
-                                '( Если да, напишите интервал в минутах. Если нет, напишите "нет".)');
+                                '( Если да, напишите интервал в минутах 5, 10, 15 ... 1440. Если нет, напишите "нет".)');
         return;
     }
 
