@@ -1,13 +1,14 @@
 var async = require('async'),
 	Math = require('math'),
 	config= require('../config'),
+	requestHandler = require('./requestHandler'),
 	db = require('../db/db');
 
 var AutoUpdate= function () {
 	var timeouts = [];
 	var instance;
 
-	var update = function(){
+	var update = function(bot){
 		var currentTimeout = 5;
 		var nextTimeout
 
@@ -44,16 +45,13 @@ var AutoUpdate= function () {
 					],function(err,result){
 						db.mongoose.connection.close();
 						if(err) console.log(err);
-						console.log(result)
+						requestHandler(result, item.chatId, bot, true);
 					});
-				//console.log(item);
-				//console.log('делаем запрос');
 			});
-			//console.log('\n\n');
 
-			setTimeout(rec, dif*1000);
+			setTimeout(rec, dif*1000*60/2);
 		}
-	}();
+	};
 
 
 	var AutoUpdate = function(chatId, timeout) {
@@ -71,16 +69,18 @@ var AutoUpdate= function () {
 		});
 	}
 
-	AutoUpdate.prototype.startAutoUpdate = function(){
+	AutoUpdate.prototype.startAutoUpdate = function(bot){
 		if(timeouts.length !== 1){
 			return;
 		}
-		setTimeout(update,5000);
+		setTimeout(function(){
+				update(bot)();
+			},5000*60/2);
 	}
 
 	AutoUpdate.prototype.removeInterval = function(chatId){
 		for(var i = 0, l = timeouts.length; i < l; i++){
-			if(timeouts[i].chatId === chatId){
+			if(timeouts[i] && timeouts[i].chatId === chatId){
 				delete timeouts[i]
 				break;
 			}

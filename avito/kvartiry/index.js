@@ -18,12 +18,12 @@ var requireModulesAndSetVar = function(userRequest, chatId, bot){
     }
 };
 
-var avito = function(userRequest, chatId, bot){
+var avito = function(userRequest, chatId, bot, isAutoUpdate){
     if(!requireModulesAndSetVar(userRequest, chatId, bot)){
         return;
     }
     var firstRequest = wrappers.requestPromiseWrapper(url),
-        parseMainPage = wrappers.parseMainPageWrapper(chatId, bot, parser, maxQuantity),
+        parseMainPage = wrappers.parseMainPageWrapper(chatId, bot, parser, maxQuantity, isAutoUpdate),
         parsePages = wrappers.parsePagesWrapper(chatId, bot, view, pageParser);
 
     firstRequest

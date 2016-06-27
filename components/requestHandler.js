@@ -1,9 +1,12 @@
 'use strict';
 
-var requestHandler = function(request, chatId, bot){
+var adaptUserRequest = require('./userRequestAdaptor');
+
+var requestHandler = function(request, chatId, bot, isAutoUpdate){
     try{
-    	var index = require('../avito/'+request.what+'/index');
-        index(request, chatId, bot);
+    	var adaptedRequest = adaptUserRequest(request);
+    	var index = require('../avito/'+adaptedRequest.what+'/index');
+        index(adaptedRequest, chatId, bot, isAutoUpdate);
     }catch(e){
     	throw e;
         //bot.sendMessage(chatId,'Что то не так =(. Я не умею искать такие объявления.');

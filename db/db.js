@@ -22,6 +22,7 @@ var setUserWrapper = function(chatId, searchRequest){
     var user = new User({
         _id: chatId,
         searchRequest: searchRequest,
+        lastDate: '';
     });
 
     return function(affected, callback){
@@ -40,6 +41,24 @@ var getUserRequestWrapper = function(chatId){
         });
     };
 };
+
+var getLastDateWrapper = function(chatId){
+    return function(affected, callback){
+        User.findOne({_id: chatId}, function(err, user){
+            if(err) callback(err);
+            callback(null, user.get('lastDate'));
+        });
+    }
+}
+
+var setLastDateWrapper = function(chatId, lastDate){
+    return function(affected, callback){
+        User.update({_id: chatId}, {lastDate: lastDate}, options, function(err, user){?????????????????????????????//
+            if(err) callback(err);
+            callback(null, true);
+        });
+    }
+}
 
 module.exports.setConnectionWrapper = setConnectionWrapper;
 module.exports.removeUserWrapper = removeUserWrapper;

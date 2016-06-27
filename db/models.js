@@ -3,6 +3,7 @@ var mongoose = require('mongoose');
 var schema = mongoose.Schema({
   _id: Number,
   searchRequest: String,
+  lastDate: String,
 });
 
 var User = mongoose.model('User',schema);

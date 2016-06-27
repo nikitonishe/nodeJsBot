@@ -2,7 +2,6 @@
 
 var TelegramBot = require('node-telegram-bot-api'),
     async = require('async'),
-    adaptUserRequest = require('./components/userRequestAdaptor'),
     requestHandler = require('./components/requestHandler'),
     db = require('./db/db'),
     config = require('./config'),
@@ -68,8 +67,7 @@ bot.on('text', function(message){
             return;
         }
         if(textMes.match(/нет/)){
-            var adaptedRequest = adaptUserRequest(storageItem);
-            requestHandler(adaptedRequest, chatId, bot);
+            requestHandler(storageItem, chatId, bot, false);
             storage.removeItem(chatId);
             return;
         }
@@ -81,8 +79,7 @@ bot.on('text', function(message){
             bot.sendMessage(chatId, 'Некорректный интеравал. Попробуйте еще раз. Доступные интервалы: 5, 10, 15 ... 1440.');
             return;
         }
-        var adaptedRequest = adaptUserRequest(storageItem);
-        requestHandler(adaptedRequest, chatId, bot);
+        requestHandler(storageItem, chatId, bot, true);
         storage.removeItem(chatId);
 
         var removeUser = db.removeUserWrapper(chatId),
@@ -99,7 +96,7 @@ bot.on('text', function(message){
             });
         var autoUpdate = new AutoUpdate();
         autoUpdate.addInterval(chatId, textMes[0]);
-        autoUpdate.startAutoUpdate();
+        autoUpdate.startAutoUpdate(bot);
         return;
     }
 
