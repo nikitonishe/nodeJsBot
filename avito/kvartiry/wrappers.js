@@ -1,6 +1,6 @@
 var async = require('async'),
     request = require('request'),
-    db = require('../../../db/db');
+    db = require('../../db/db');
 
 var requestPromiseWrapper = function(url){
     return new Promise(function(resolve,reject){
@@ -10,19 +10,18 @@ var requestPromiseWrapper = function(url){
     });
 };
 
-var parseMainPageWrapper = function(chatId, bot, parser, maxQuantity, isAutoUpdate){ 
+var parseMainPageWrapper = function(chatId, bot, parser, maxQuantity){ 
     return function(body){
-        var parsedData = parser(body, maxQuantity, isAutoUpdate);
+        var parsedData = parser(body, maxQuantity);
         if(parsedData && parsedData[0]){ 
             return parsedData;
         }
         bot.sendMessage(chatId, 'Ничего не найдено =(.Чтобы отменить автообновление напишите /cancel.'+
                                 ' Чтобы начать поиск напишите /search.');
-        return false;
     };
 };
 
-var parsePagesWrapper = function(chatId, bot, view, pageParser){
+var parsePagesWrapper = function(chatId, bot, view, pageParser, isAutoUpdate){
     return function(parsedData){
         if(!parsedData && !parsedData[0]){
             return;
@@ -46,7 +45,7 @@ var parsePagesWrapper = function(chatId, bot, view, pageParser){
                 });
         },function(err){
             if(err) console.log(err);
-            else view(parsedData, chatId, bot)();
+            else view(parsedData, chatId, bot, isAutoUpdate)();
             return false;
         });
     }

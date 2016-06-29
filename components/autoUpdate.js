@@ -49,7 +49,7 @@ var AutoUpdate= function () {
 					});
 			});
 
-			setTimeout(rec, dif*1000*60/2);
+			setTimeout(rec, dif*1000*60/12);
 		}
 	};
 
@@ -75,7 +75,7 @@ var AutoUpdate= function () {
 		}
 		setTimeout(function(){
 				update(bot)();
-			},5000*60/2);
+			},5000*60/12);
 	}
 
 	AutoUpdate.prototype.removeInterval = function(chatId){

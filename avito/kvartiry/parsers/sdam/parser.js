@@ -1,9 +1,8 @@
 'use strict';
 
-var cheerio = require('cheerio'),
-    compareDate = require('./utilits/compareDate');
+var cheerio = require('cheerio');
 
-var parser = function(body, maxQuantityOfMessages, isAutoUpdate){
+var parser = function(body, maxQuantityOfMessages){
     var parsedData = [],
         $ = cheerio.load(body);
     var divs = $('.item_table');
@@ -58,35 +57,9 @@ var parser = function(body, maxQuantityOfMessages, isAutoUpdate){
     }
 
     var maxIndex = divs.length > maxQuantityOfMessages ? maxQuantityOfMessages : divs.length;
-
-    parsedData.sort(compareDate);
-    if(!isAutoUpdate){
-        parsedData.reverse();
-        parsedData.splice(maxIndex);
-        parsedData.reverse();
-        return parsedData;
-    }
-    var lastDate;
-    // взять lastDate из бд
-    if(!lastDate){
-        parsedData.reverse();
-        parsedData.splice(maxIndex);
-        parsedData.reverse();
-        return parsedData;
-    }
-    if(isAutoUpdate){
-       
-        for(var i = 0, l = parsedData.length; i < l; i++ ){
-            //отсеять обаявления старше lastDate
-        }
-
-        lastDate = parsedData[parsedData.length-1]? parsedData[parsedData.length-1].date : null;
-        if(lastDate){
-            //занести lastDate в бд
-        }
-    }
     return parsedData;
 };
+
 
 
 module.exports = parser;

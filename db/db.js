@@ -8,6 +8,8 @@ var setConnectionWrapper = function(dburl){
     };
 };
 
+
+
 var removeUserWrapper = function(chatId){
     return function(connection, callback){
         if(!connection) callback(new Error('db connect error'));
@@ -22,7 +24,7 @@ var setUserWrapper = function(chatId, searchRequest){
     var user = new User({
         _id: chatId,
         searchRequest: searchRequest,
-        lastDate: '';
+        lastDate: ''
     });
 
     return function(affected, callback){
@@ -33,6 +35,7 @@ var setUserWrapper = function(chatId, searchRequest){
     };
 };
 
+
 var getUserRequestWrapper = function(chatId){
     return function(affected, callback){
         User.findOne({_id: chatId}, function(err, user){
@@ -42,26 +45,30 @@ var getUserRequestWrapper = function(chatId){
     };
 };
 
-var getLastDateWrapper = function(chatId){
-    return function(affected, callback){
-        User.findOne({_id: chatId}, function(err, user){
-            if(err) callback(err);
-            callback(null, user.get('lastDate'));
+var getLastDatePromiseWrapper = (chatId)=>{
+    return new Promise((resolve, reject)=>{
+        User.findOne({_id: chatId}, (err, user) => {
+            if(err) reject(err);
+            resolve(user.get('lastDate'));
         });
-    }
-}
+    });
+};
 
-var setLastDateWrapper = function(chatId, lastDate){
-    return function(affected, callback){
-        User.update({_id: chatId}, {lastDate: lastDate}, options, function(err, user){?????????????????????????????//
-            if(err) callback(err);
-            callback(null, true);
+var setLastDatePromiseWrapper = (chatId, newLastDate)=>{
+    return new Promise((resolve, reject)=>{
+        User.update({_id: chatId}, {lastDate: newLastDate}, function(err, user){
+            if(err) reject(err);
+            resolve(true);
         });
-    }
-}
+    });
+};
+
 
 module.exports.setConnectionWrapper = setConnectionWrapper;
 module.exports.removeUserWrapper = removeUserWrapper;
 module.exports.setUserWrapper = setUserWrapper;
 module.exports.getUserRequestWrapper = getUserRequestWrapper;
+module.exports.getLastDatePromiseWrapper = getLastDatePromiseWrapper;
+module.exports.setLastDatePromiseWrapper = setLastDatePromiseWrapper;
 module.exports.mongoose = mongoose;
+module.exports.User = User

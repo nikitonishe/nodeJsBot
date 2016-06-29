@@ -1,12 +1,11 @@
 'use strict';
 
-var sendMessagesWithTimeout = function(parsedData, chatId, bot){
+var sendMessagesWithTimeout = function(parsedData, chatId, bot, isAutoUpdate){
     var counter = -1,
         maxIndex = parsedData.length;
 
     return function send(){
         counter++;
-
         var message = parsedData[counter].title;
 
         message += parsedData[counter].price ? ('\n' + parsedData[counter].price) : '';
@@ -26,6 +25,10 @@ var sendMessagesWithTimeout = function(parsedData, chatId, bot){
             setTimeout(send,2500);
         }else{
             setTimeout(function(){
+                if(isAutoUpdate) {
+                    bot.sendMessage(chatId, 'Чтобы остановить автообновление, напишите /cancel. Чтобы начать новый поиск, напишите /search.');
+                    return;
+                }
                 bot.sendMessage(chatId, 'Чтобы начать поиск, напишите /search.');
             },2500);
         }
