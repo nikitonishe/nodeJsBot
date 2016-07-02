@@ -1,6 +1,56 @@
 var User = require('./models').User,
     mongoose = require('./models').mongoose;
 
+                                            var async = require('async'),
+                                                config = require('../config');
+
+
+                                            var mongoose = require('mongoose'),
+                                            db = mongoose.createConnection('localhost', 'nodeJsBot');
+
+                                            db.on('error', function () {
+                                              console.log('Error! Database connection failed.');
+                                            });
+
+                                            db.once('open', function (argument) {
+                                              console.log('Database connection established!');
+
+                                                db.db.collectionNames(function (error, names) {
+                                                    if (error) {
+                                                        console.log('Error: '+ error);
+                                                    } else {
+                                                        console.log(names);
+                                                    };
+                                                });
+                                            });
+/*
+                                            var setConnectionWrapper = function(dburl){
+                                                return function(callback){
+                                                    var connection = mongoose.createConnection(dburl);
+                                                    callback(null, connection);
+                                                };
+                                            };
+
+                                            var setConnection = setConnectionWrapper(config.dburl);
+                                            async.waterfall([
+                                                setConnection
+                                                ],(err,connection)=>{
+                                                    if(err) console.log(err);
+                                                    mongoose.connection.collectionNames(function (error, names) {
+                                                        if (error) {
+                                                          console.log('Error: '+ error);
+                                                        } else {
+                                                          console.log(names);
+                                                        };
+                                                    });
+                                                    result.base.models.User.findOne(function(err, user){
+                                                        console.log(1);
+                                                        if(err) console.log(err);
+                                                        console.log(1)
+                                                        console.log(user+1);
+                                                    })
+                                                })*/
+
 var setConnectionWrapper = function(dburl){
     return function(callback){
         mongoose.connect(dburl);
@@ -49,7 +99,10 @@ var getLastDatePromiseWrapper = (chatId)=>{
     return new Promise((resolve, reject)=>{
         User.findOne({_id: chatId}, (err, user) => {
             if(err) reject(err);
-            resolve(user.get('lastDate'));
+            if(user){
+                resolve(user.get('lastDate'));
+            }
+            resolve(null);
         });
     });
 };

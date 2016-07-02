@@ -16,6 +16,7 @@ var pageParser = function(body){
 
     photoLink = $('.g_123 .l-content .clearfix .g_92 .b-item-photo .big-picture img');
     photoLink = $(photoLink).attr('src');
+    photoLink = photoLink? photoLink.substring(2):photoLink;
 
     parsedPage.photoLink = photoLink;
     return parsedPage;

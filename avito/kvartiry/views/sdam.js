@@ -12,17 +12,23 @@ var sendMessagesWithTimeout = function(parsedData, chatId, bot, isAutoUpdate){
         message += '\n'+parsedData[counter].address +'\nпосредник: ' + parsedData[counter].middleman;
         message += parsedData[counter].commission ? ('\nкомиссия: ' + parsedData[counter].commission) : '';
         message += parsedData[counter].date ? ('\nдата размещения объявления: ' + parsedData[counter].date) : '';
-        message += parsedData[counter].photoLink ? ('\n' + parsedData[counter].photoLink) : '';
+        message += '\nподробнее: avito.ru'+parsedData[counter].link;
         bot.sendMessage(chatId, message);
+
+        if(parsedData[counter].photoLink){
+            setTimeout(function(){
+                bot.sendMessage(chatId, parsedData[counter].photoLink);
+            },1000);   
+        }
 
         if(parsedData[counter].location.lat && parsedData[counter].location.lon){
             setTimeout(function(){
                 bot.sendLocation(chatId, parsedData[counter].location.lat, parsedData[counter].location.lon);
-            },1000);
+            },1500);
         }
 
-        if(counter < (maxIndex - 1)){
-            setTimeout(send,2500);
+        if(counter < (maxIndex-1)){
+            setTimeout(send,4000);
         }else{
             setTimeout(function(){
                 if(isAutoUpdate) {

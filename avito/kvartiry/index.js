@@ -39,7 +39,7 @@ var avito = function(userRequest, chatId, bot, isAutoUpdate){
 
             return db.getLastDatePromiseWrapper(chatId)
                 .then(lastDate => {
-                    if(!lastDate || !isAutoUpdate){
+                    if(!isAutoUpdate || !lastDate){
                         var maxIndex = parsedData.length > maxQuantity ? maxQuantity : parsedData.length;
                         parsedData.splice(maxIndex);
                         parsedData.reverse();
@@ -60,7 +60,10 @@ var avito = function(userRequest, chatId, bot, isAutoUpdate){
             if(!parsedData || !parsedData[0]){
                 return new Promise((resole,reject)=>reject(null));
             }
-
+            if(!isAutoUpdate){
+                db.mongoose.connection.close();
+                return parsedData;
+            }
             return db.setLastDatePromiseWrapper(chatId, parsedData[parsedData.length - 1].date)
                 .then(() => {
                     db.mongoose.connection.close();
