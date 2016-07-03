@@ -1,12 +1,17 @@
 var mongoose = require('mongoose');
 
-var schema = mongoose.Schema({
+var userSchema = mongoose.Schema({
   _id: Number,
   searchRequest: String,
   lastDate: String,
 });
 
-var User = mongoose.model('User',schema);
+var User = function(chatId, searchRequest){
+	this._id = chatId;
+	this.searchRequest = searchRequest;
+	this.lastDate = '';
+}
 
-module.exports.User = mongoose.model('User',schema);
+module.exports.userSchema = userSchema;
+module.exports.User = User;
 module.exports.mongoose = mongoose;

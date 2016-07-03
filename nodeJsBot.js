@@ -1,9 +1,8 @@
 'use strict';
 
 var TelegramBot = require('node-telegram-bot-api'),
-    async = require('async'),
     requestHandler = require('./components/requestHandler'),
-    db = require('./db/db'),
+    Db = require('./db/db').Db,
     config = require('./config'),
     AutoUpdate = require('./components/autoUpdate'),
     LocalStorage = require('node-localstorage').LocalStorage;
@@ -27,17 +26,15 @@ bot.on('text', function(message){
 
         autoUpdate.removeInterval(chatId);
 
-        var removeUser = db.removeUserWrapper(chatId),
-            setConnection = db.setConnectionWrapper(config.dburl);
+        var db = new Db(config.dburl);
 
+        db.removeUserPromise(chatId)
+            .then(() => db.connection.close())
+            .catch(err => {
+                if(err) console.log(err)
+                db.connection.close();
+            });
 
-        async.waterfall([
-            setConnection,
-            removeUser
-            ],function(err,result){
-                db.mongoose.connection.close();
-                if(err) console.log(err);
-            })
         bot.sendMessage(chatId, 'Поиск отменен. Чтобы начать поиск, напишите /search.');
         return;
     }
@@ -82,21 +79,20 @@ bot.on('text', function(message){
         requestHandler(storageItem, chatId, bot, true);
         storage.removeItem(chatId);
 
-        var removeUser = db.removeUserWrapper(chatId),
-            setConnection = db.setConnectionWrapper(config.dburl),
-            setUser = db.setUserWrapper(chatId, storageItem.replace(/\/[0-9]+/, ''));
+        var db = new Db(config.dburl);
 
-        async.waterfall([
-            setConnection,
-            removeUser,
-            setUser
-            ],function(err, result){
+        db.removeUserPromise(chatId)
+            .then(() => db.setUserPromise(chatId,storageItem.replace(/\/[0-9]+/, '')))
+            .then(() => db.connection.close())
+            .catch(err => {
                 if(err) console.log(err);
-                db.mongoose.connection.close();
+                db.connection.close();
             });
+
         var autoUpdate = new AutoUpdate();
         autoUpdate.addInterval(chatId, textMes[0]);
         autoUpdate.startAutoUpdate(bot);
+
         return;
     }
 

@@ -1,8 +1,8 @@
-var async = require('async'),
-	Math = require('math'),
-	config= require('../config'),
+'use strict';
+
+var config= require('../config'),
 	requestHandler = require('./requestHandler'),
-	db = require('../db/db');
+	Db = require('../db/db').Db;
 
 var AutoUpdate= function () {
 	var timeouts = [];
@@ -11,8 +11,6 @@ var AutoUpdate= function () {
 	var update = function(bot){
 		var currentTimeout = 5;
 		var nextTimeout
-
-		var setConnection = db.setConnectionWrapper(config.dburl);
 
 		return function rec(){
 			var currentTimeouts = [];
@@ -38,15 +36,16 @@ var AutoUpdate= function () {
 			}
 
 			currentTimeouts.forEach(function(item, i, arr){
-				var getUserRequest = db.getUserRequestWrapper(item.chatId);
-				async.waterfall([
-					setConnection,
-					getUserRequest,
-					],function(err,result){
-						db.mongoose.connection.close();
-						if(err) console.log(err);
-						requestHandler(result, item.chatId, bot, true);
-					});
+				var db = new Db(config.dburl);
+				db.getUserRequestPromise(item.chatId)
+					.then((userRequest)=>{
+						db.connection.close();
+						requestHandler(userRequest, item.chatId, bot, true);
+					})
+					.catch((err)=>{
+						if(err)consol.log(err);
+						db.connection.close();
+					})
 			});
 
 			setTimeout(rec, dif*1000*60/5);

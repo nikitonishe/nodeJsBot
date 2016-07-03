@@ -1,7 +1,7 @@
 'use strict';
 
 var wrappers = require('./wrappers'),
-    db = require('../../db/db'),
+    Db = require('../../db/db').Db,
     config =  require('../../config'),
     compareDate = require('../utilits/compareDate'),
     parser,pageParser,view,url,maxQuantity;
@@ -28,16 +28,16 @@ var avito = function(userRequest, chatId, bot, isAutoUpdate){
     var parseMainPage = wrappers.parseMainPageWrapper(chatId, bot, parser, maxQuantity),
         parsePages = wrappers.parsePagesWrapper(chatId, bot, view, pageParser, isAutoUpdate);
 
+    var db = new Db(config.dburl);
+
     wrappers.requestPromiseWrapper(url)
         .then(parseMainPage)
         .then((parsedData) => {
 
-            var parsedData = parsedData;
             parsedData.sort(compareDate);
             parsedData.reverse();
-            db.mongoose.connect(config.dburl);
 
-            return db.getLastDatePromiseWrapper(chatId)
+            return db.getLastDatePromise(chatId)
                 .then(lastDate => {
                     if(!isAutoUpdate || !lastDate){
                         var maxIndex = parsedData.length > maxQuantity ? maxQuantity : parsedData.length;
@@ -61,19 +61,19 @@ var avito = function(userRequest, chatId, bot, isAutoUpdate){
                 return new Promise((resole,reject)=>reject(null));
             }
             if(!isAutoUpdate){
-                db.mongoose.connection.close();
+                db.connection.close();
                 return parsedData;
             }
-            return db.setLastDatePromiseWrapper(chatId, parsedData[parsedData.length - 1].date)
+            return db.setLastDatePromise(chatId, parsedData[parsedData.length - 1].date)
                 .then(() => {
-                    db.mongoose.connection.close();
+                    db.connection.close();
                     return parsedData;
                 });
 
         }).then(parsePages)
         .catch(function(err, parsedData) {
             if(err) console.log(err);
-            db.mongoose.connection.close();
+            db.connection.close();
         })
 };
 
